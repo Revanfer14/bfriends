@@ -15,13 +15,19 @@ datasource db {
 }
 
 model User {
-  id              String @id
-  email           String
-  firstName       String
-  lastName        String
-  imageUrl        String?
-  userName        String? @unique
-  createdAt       DateTime @default(now())
+  id               String    @id // From Supabase Auth
+  email            String    @unique // From Supabase Auth
+  userName         String?   @unique // Display name, can be updated during onboarding
+  imageUrl         String?   // Defaulted, can be updated
+  fullName         String?   // To be filled during onboarding
+  universityId     String?   @unique // Student/Employee ID, to be filled during onboarding
+  departmentMajor  String?   // Optional
+  bioDescription   String?   // Optional
+  occupationRole   String[]  @default([]) // Array of strings for roles
+  batch            String?   // Optional, e.g., "B25"
+  customLinks      Json      @default("[]") // For [{title: "Site", url: "..."}]
+  profileComplete  Boolean   @default(false)
+  createdAt        DateTime  @default(now())
 
   createdSubposts Subpost[]
   posts           Post[]

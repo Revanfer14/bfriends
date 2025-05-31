@@ -9,8 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MenuIcon } from "lucide-react";
 import Link from "next/link";
-import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import Image from "next/image";
+import { logoutAction } from "../actions";
+import { useTransition } from 'react';
 
 interface AppProps {
   userImage: string | null;
@@ -18,6 +19,7 @@ interface AppProps {
 }
 
 export function UserDropdown({ userImage, userName }: AppProps) {
+  const [isPending, startTransition] = useTransition();
   const defaultImage = "/default.png";
 
   return (
@@ -64,8 +66,16 @@ export function UserDropdown({ userImage, userName }: AppProps) {
         <DropdownMenuSeparator />
 
         {/* Logout */}
-        <DropdownMenuItem>
-          <LogoutLink className="w-full">Log out</LogoutLink>
+        <DropdownMenuItem
+          onClick={() => {
+            startTransition(async () => {
+              await logoutAction();
+            });
+          }}
+          disabled={isPending}
+          className="cursor-pointer"
+        >
+          {isPending ? 'Logging out...' : 'Log out'}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
