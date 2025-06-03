@@ -1,3 +1,5 @@
+console.log("✅ next.config.ts is loaded by Vercel");
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
