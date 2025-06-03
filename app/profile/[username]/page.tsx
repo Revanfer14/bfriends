@@ -216,7 +216,7 @@ async function getUserProfileData(userName: string, searchParamsPropFromPage: Us
 }
 
 export default async function UserProfilePage({ params: pageParams, searchParams }: UserProfilePageProps) {
-  const { username: awaitedUsername } = await pageParams;
+  const { username: awaitedUsername } = pageParams;
   const profileUsername = awaitedUsername;
   const profileDataBundle = await getUserProfileData(profileUsername, searchParams);
 
