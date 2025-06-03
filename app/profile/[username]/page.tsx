@@ -11,25 +11,33 @@ import { unstable_noStore as noStore } from 'next/cache';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, CalendarDays, Briefcase, MapPin, UserCircle, GraduationCap, ListTree } from 'lucide-react';
-import { format, startOfToday, endOfToday, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns'; 
+import { format, startOfToday, endOfToday, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import { VoteType, Prisma } from '@prisma/client'; // Added Prisma
 import { SortPostsDropdown, SortOption } from '../../components/SortPostsDropdown'; // Corrected path
 
 const POSTS_PER_PAGE = 5;
 const COMMENTS_PER_PAGE = 10;
 
-interface UserProfilePageProps {
-  params: { username: string };
-  searchParams: {
-    postsPage?: string;
-    commentsPage?: string;
-    tab?: string;
-    postsSort?: string; // Added for post sorting
-  };
+// Define the expected shape of the resolved searchParams object
+interface ResolvedSearchParams {
+  postsPage?: string;
+  commentsPage?: string;
+  tab?: string;
+  postsSort?: string;
 }
 
-async function getUserProfileData(userName: string, searchParamsPropFromPage: UserProfilePageProps['searchParams']) {
-  noStore(); // Keep this if you need to ensure data isn't cached across requests
+// Define the expected shape of the resolved params object
+interface ResolvedParams {
+  username: string;
+}
+
+interface UserProfilePageProps {
+  params: Promise<ResolvedParams>; // Changed to Promise
+  searchParams: Promise<ResolvedSearchParams>; // Changed to Promise
+}
+
+async function getUserProfileData(userName: string, searchParamsPropFromPage: Promise<ResolvedSearchParams>) { // searchParamsPropFromPage is a Promise
+  noStore();
 
   // Apply the "await" pattern to the searchParams object itself
   const resolvedSearchParams = await searchParamsPropFromPage;
@@ -53,8 +61,8 @@ async function getUserProfileData(userName: string, searchParamsPropFromPage: Us
 
   // Parse and validate postsSort parameter
   const validSortOptions: SortOption[] = ['recent', 'top-today', 'top-week', 'top-month', 'top-year'];
-  const postsSortToUse = resolvedSearchParams.postsSort && validSortOptions.includes(resolvedSearchParams.postsSort as SortOption) 
-    ? resolvedSearchParams.postsSort as SortOption 
+  const postsSortToUse = resolvedSearchParams.postsSort && validSortOptions.includes(resolvedSearchParams.postsSort as SortOption)
+    ? resolvedSearchParams.postsSort as SortOption
     : 'recent';
 
   const validTabs = ['posts', 'comments', 'activity'];
@@ -113,7 +121,7 @@ async function getUserProfileData(userName: string, searchParamsPropFromPage: Us
     ...postsDateFilter,
   };
 
-  const postsOrderByClause: Prisma.PostOrderByWithRelationInput[] | Prisma.PostOrderByWithRelationInput = 
+  const postsOrderByClause: Prisma.PostOrderByWithRelationInput[] | Prisma.PostOrderByWithRelationInput =
   postsSortToUse === 'recent'
     ? { createdAt: Prisma.SortOrder.desc }
     : [{ netVoteScore: Prisma.SortOrder.desc }, { createdAt: Prisma.SortOrder.desc }];
@@ -133,8 +141,8 @@ async function getUserProfileData(userName: string, searchParamsPropFromPage: Us
       updatedAt: true,
       subName: true,
       userId: true,
-      User: { select: { userName: true, imageUrl: true, fullName: true } }, 
-      vote: { select: { userId: true, voteType: true } }, 
+      User: { select: { userName: true, imageUrl: true, fullName: true } },
+      vote: { select: { userId: true, voteType: true } },
       _count: { select: { comment: true } },
       netVoteScore: true, // Ensure netVoteScore is selected
     },
@@ -201,44 +209,44 @@ async function getUserProfileData(userName: string, searchParamsPropFromPage: Us
     .slice(0, 5);
   // --- END: New logic for 'Most Active In' BHubs ---
 
-  return { 
-    user, 
-    posts, 
-    postsCount, 
-    comments, 
-    commentsCount, 
-    parsedPostsPage, 
-    parsedCommentsPage, 
+  return {
+    user,
+    posts,
+    postsCount,
+    comments,
+    commentsCount,
+    parsedPostsPage,
+    parsedCommentsPage,
     determinedActiveTab,
     postsSortToUse, // Return the validated sort option
-    topBHubs: sortedBHubs, 
+    topBHubs: sortedBHubs,
   };
 }
 
 export default async function UserProfilePage({ params: paramsProp, searchParams : searchParamsProp  }: UserProfilePageProps) {
- noStore();
+  noStore();
 
-  // ---- FIX IS HERE: Await the props before accessing their properties ----
-  const params = await paramsProp;
-  const searchParams = await searchParamsProp; // You fixed this for searchParams before
-  // ---- END FIX ----
+  const params = await paramsProp; // paramsProp is a Promise
+  const searchParams = await searchParamsProp; // searchParamsProp is a Promise
 
-  const { username } = params; // Now correctly access username from the "awaited" params
+  const { username } = params;
 
-  // Pass the "awaited" searchParams to your data fetching function
-  const profileDataBundle = await getUserProfileData(username, searchParams);
+  // Pass the Promise searchParamsProp directly to getUserProfileData
+  // getUserProfileData will await it.
+  const profileDataBundle = await getUserProfileData(username, searchParamsProp);
+
 
   if (!profileDataBundle || !profileDataBundle.user) {
     notFound();
   }
-  const { 
-    user, 
-    posts, 
-    postsCount, 
-    comments, 
-    commentsCount, 
-    parsedPostsPage, 
-    parsedCommentsPage, 
+  const {
+    user,
+    posts,
+    postsCount,
+    comments,
+    commentsCount,
+    parsedPostsPage,
+    parsedCommentsPage,
     determinedActiveTab,
     postsSortToUse, // Destructure the sort option
     topBHubs
@@ -287,7 +295,7 @@ export default async function UserProfilePage({ params: paramsProp, searchParams
             <p className="text-muted-foreground">@{user.userName}</p>
             <div className="flex items-center text-sm text-muted-foreground">
               <CalendarDays className="mr-2 h-4 w-4" />
-              Joined {format(new Date(user.createdAt), 'MMMM yyyy')}
+              Joined {format(new Date(user.createdAt), 'MMMM do, yyyy')}
             </div>
             {user.bioDescription && (
               <p className="text-sm text-foreground pt-2">{user.bioDescription}</p>
@@ -436,7 +444,7 @@ export default async function UserProfilePage({ params: paramsProp, searchParams
                   voteCount={post.netVoteScore ?? 0} // Use netVoteScore
                   commentAmount={post._count.comment}
                   currentPath={`/profile/${username}?tab=posts&postsSort=${postsSortToUse}&postsPage=${parsedPostsPage}`}
-                  userVote={currentUserVoteOnPost}
+                  userVote={currentUserVoteOnPost as VoteType | null}
                   postUserId={post.userId as string} // userId on post is non-nullable
                   currentUserId={viewingUser?.id}
                 />
@@ -462,7 +470,7 @@ export default async function UserProfilePage({ params: paramsProp, searchParams
                 </p>
                 <p className="mb-2 text-sm md:text-base">{comment.text}</p>
                 {comment.Post && (
-                  <Link href={`/p/${comment.Post.subName}/comments/${comment.Post.id}`} className="text-xs text-primary hover:underline">
+                  <Link href={`/post/${comment.Post.id}`} className="text-xs text-primary hover:underline">
                     View post: "{comment.Post.title}" in bhub/{comment.Post.subName || 'General'}
                   </Link>
                 )}
