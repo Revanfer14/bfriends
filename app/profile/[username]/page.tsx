@@ -215,10 +215,18 @@ async function getUserProfileData(userName: string, searchParamsPropFromPage: Us
   };
 }
 
-export default async function UserProfilePage({ params: pageParams, searchParams }: UserProfilePageProps) {
-  const { username: awaitedUsername } = pageParams;
-  const profileUsername = awaitedUsername;
-  const profileDataBundle = await getUserProfileData(profileUsername, searchParams);
+export default async function UserProfilePage({ params: paramsProp, searchParams : searchParamsProp  }: UserProfilePageProps) {
+ noStore();
+
+  // ---- FIX IS HERE: Await the props before accessing their properties ----
+  const params = await paramsProp;
+  const searchParams = await searchParamsProp; // You fixed this for searchParams before
+  // ---- END FIX ----
+
+  const { username } = params; // Now correctly access username from the "awaited" params
+
+  // Pass the "awaited" searchParams to your data fetching function
+  const profileDataBundle = await getUserProfileData(username, searchParams);
 
   if (!profileDataBundle || !profileDataBundle.user) {
     notFound();
@@ -391,13 +399,13 @@ export default async function UserProfilePage({ params: pageParams, searchParams
       <Tabs defaultValue={determinedActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="posts" asChild>
-            <Link href={`/profile/${awaitedUsername}?tab=posts`} scroll={false}>Posts ({postsCount})</Link>
+            <Link href={`/profile/${username}?tab=posts`} scroll={false}>Posts ({postsCount})</Link>
           </TabsTrigger>
           <TabsTrigger value="comments" asChild>
-            <Link href={`/profile/${awaitedUsername}?tab=comments`} scroll={false}>Comments ({commentsCount})</Link>
+            <Link href={`/profile/${username}?tab=comments`} scroll={false}>Comments ({commentsCount})</Link>
           </TabsTrigger>
           <TabsTrigger value="activity" asChild>
-            <Link href={`/profile/${awaitedUsername}?tab=activity`} scroll={false} className="flex items-center justify-center">
+            <Link href={`/profile/${username}?tab=activity`} scroll={false} className="flex items-center justify-center">
               <ListTree className="mr-2 h-4 w-4" /> Activity
             </Link>
           </TabsTrigger>
@@ -427,7 +435,7 @@ export default async function UserProfilePage({ params: pageParams, searchParams
                   userName={post.User.userName || user.userName || 'User'} // Prioritize post.User.userName
                   voteCount={post.netVoteScore ?? 0} // Use netVoteScore
                   commentAmount={post._count.comment}
-                  currentPath={`/profile/${profileUsername}?tab=posts&postsSort=${postsSortToUse}&postsPage=${parsedPostsPage}`}
+                  currentPath={`/profile/${username}?tab=posts&postsSort=${postsSortToUse}&postsPage=${parsedPostsPage}`}
                   userVote={currentUserVoteOnPost}
                   postUserId={post.userId as string} // userId on post is non-nullable
                   currentUserId={viewingUser?.id}
