@@ -1,7 +1,8 @@
-console.log("✅ next.config.js is loaded by Vercel");
+console.log("✅ next.config.ts is loaded by Vercel");
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
@@ -21,4 +22,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
