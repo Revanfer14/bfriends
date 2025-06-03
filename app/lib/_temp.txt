@@ -1,0 +1,1 @@
+This is a temporary file to ensure the app/lib directory can be created.
