@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { signUpAction } from "@/app/actions"; // We will define this action next
+import { signUpAction } from "@/app/actions";
 import { FormState } from '@/app/lib/definitions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,10 +34,6 @@ export function SignUpForm() {
       if (state.status === 'error') {
         toast.error(state.message);
       } else {
-        // Check if there are no field errors before showing a general success message
-        // This prevents showing a general success toast if there were specific field validation successes
-        // that aren't meant to be global success messages.
-        // However, for signup, a general success message is usually fine.
         if (!state.errors || Object.keys(state.errors).length === 0) {
             toast.success(state.message);
         }
@@ -46,17 +42,17 @@ export function SignUpForm() {
   }, [state]);
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-6">
       <div>
         <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" placeholder="name@binus.ac.id" required />
+        <Input id="email" name="email" type="email" placeholder="name@binus.ac.id" className="mt-1 block w-full" required />
         {state?.errors?.email && (
           <p className="text-sm text-red-500 mt-1">{state.errors.email.join(', ')}</p>
         )}
       </div>
       <div>
         <Label htmlFor="password">Password</Label>
-        <Input id="password" name="password" type="password" required minLength={6} />
+        <Input id="password" name="password" type="password" required minLength={6} className="mt-1 block w-full" />
         {state?.errors?.password && (
           <p className="text-sm text-red-500 mt-1">{state.errors.password.join(', ')}</p>
         )}

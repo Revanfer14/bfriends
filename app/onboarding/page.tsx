@@ -22,7 +22,7 @@ export default async function OnboardingPage() {
       where: { id: userId },
       select: {
         id: true,
-        email: true, // Useful for display or if needed by form
+        email: true,
         userName: true,
         fullName: true,
         userPrimaryRole: true,
@@ -40,23 +40,18 @@ export default async function OnboardingPage() {
     });
   } catch (error) {
     console.error('Onboarding page: Error fetching user profile from Prisma:', error);
-    // Potentially redirect to an error page or home
     redirect('/'); 
   }
 
   if (!userProfile) {
     console.error('Onboarding page: User profile not found in Prisma for ID:', userId);
-    // This case should ideally not happen if signup creates a profile.
-    // Redirecting to home or an error page.
     redirect('/'); 
   }
 
   if (userProfile.profileComplete) {
-    redirect('/'); // Already onboarded, go to home
+    redirect('/');
   }
 
-  // The OnboardingForm now handles customLinks as an array of objects internally.
-  // We pass the raw Prisma JSON value, or an empty array if null/undefined.
   const initialCustomLinks = (userProfile.customLinks && Array.isArray(userProfile.customLinks)) 
     ? userProfile.customLinks 
     : [];
@@ -78,10 +73,7 @@ export default async function OnboardingPage() {
               email: userProfile.email,
               fullName: userProfile.fullName,
               userName: userProfile.userName,
-              userPrimaryRole: userProfile.userPrimaryRole as UserRoleType | undefined, // Cast if necessary
-              // The form initializes other fields like nim, studentMajor etc., to empty strings if not in fieldValues from state
-              // So we only need to pass what might have a pre-existing value from the DB.
-              // campusLocations, occupationRole, customLinks are handled by the form's state/defaultValues if not in fieldValues
+              userPrimaryRole: userProfile.userPrimaryRole as UserRoleType | undefined,
             }}
           />
         </Suspense>

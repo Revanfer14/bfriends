@@ -13,6 +13,7 @@ import Link from "next/link";
 import pfp from "../../../public/pfp.png";
 import { Input } from "@/components/ui/input";
 import { unstable_noStore as noStore } from "next/cache";
+import { notFound } from "next/navigation";
 import { VoteType, Prisma } from "@prisma/client"; 
 import { SortPostsDropdown, SortOption } from "../../components/SortPostsDropdown"; 
 import { subDays, subWeeks, subMonths, subYears, startOfToday, endOfToday, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns'; 
@@ -120,6 +121,10 @@ export default async function SubpostRoute(props: AppProps) {
 
   const { data, count } = await getData(id, currentPage, sortToUse);
   const user = await getSupabaseUser();
+
+  if (!data) {
+    return notFound();
+  }
 
   type SelectedVoteForCard = {
     userId: string | null;

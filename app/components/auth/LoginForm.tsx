@@ -44,7 +44,7 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-6">
       <div>
-        <Label htmlFor="email">Email address</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
           id="email"
           name="email"
@@ -62,12 +62,6 @@ export function LoginForm() {
       <div>
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
-          {/* Optional: Add Forgot Password link */}
-          {/* <div className="text-sm">
-            <Link href="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-              Forgot your password?
-            </Link>
-          </div> */}
         </div>
         <Input
           id="password"

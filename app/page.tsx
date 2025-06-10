@@ -5,7 +5,7 @@ import HelloImage from "../public/hero-image.png";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Prisma } from "@prisma/client"; // Added Prisma import
+import { Prisma } from "@prisma/client";
 import { CreatePostCard } from "./components/CreatePostCard";
 import { SortPostsDropdown, SortOption } from "./components/SortPostsDropdown";
 import { prisma } from "./lib/prisma";
@@ -15,9 +15,9 @@ import { SuspenseCard } from "./components/SuspenseCard";
 import Pagination from "./components/Pagination";
 import { unstable_noStore as noStore } from "next/cache";
 import { subDays, subWeeks, subMonths, subYears, startOfToday, endOfToday, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
-import pfp from "../public/pfp.png"; // Assuming pfp is in public folder
+import pfp from "../public/pfp.png";
 import { getSupabaseUser } from "@/app/lib/supabase/server";
-import { VoteType, Vote } from "@prisma/client"; // Added Vote import
+import { VoteType, Vote } from "@prisma/client";
 
 async function getData(page: string, sort: SortOption) {
     noStore();
@@ -115,7 +115,7 @@ export default async function Home(props: AppProps) {
     <div className="max-w-[1000px] mx-auto flex gap-x-10 mt-4 mb-10">
       <div className="w-[65%] flex flex-col gap-y-5">
         <CreatePostCard />
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end mb-1">
           <SortPostsDropdown currentSort={sortToUse} />
         </div>
         <Suspense fallback={<SuspenseCard />} key={`${currentPage}-${sortToUse}`}>
@@ -188,12 +188,10 @@ export default async function Home(props: AppProps) {
   );
 }
 
-// Define a type for the shape of vote data we are selecting
 type SelectedVote = {
   userId: string | null;
   voteType: VoteType;
   postId: string | null;
-  // Add 'id: string' here if you also select vote.id in getData
 };
 
 async function ShowItems({ searchParams, userId }: { searchParams: { page: string; sort: SortOption }; userId?: string }) {
@@ -202,10 +200,8 @@ async function ShowItems({ searchParams, userId }: { searchParams: { page: strin
   return (
     <>
       {data
-        .filter(post => typeof post.userId === 'string') // Ensure userId is non-null and a string
+        .filter(post => typeof post.userId === 'string')
         .map((post) => {
-          // Explicitly define the type for 'v' in find and 'vote' in reduce
-          // This helps TypeScript understand the structure of post.vote
         const userVoteRecord = userId ? post.vote.find((v: SelectedVote) => v.userId === userId) : undefined;
         const userVote = userVoteRecord ? userVoteRecord.voteType as VoteType : null;
         return (

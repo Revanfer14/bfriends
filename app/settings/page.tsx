@@ -34,10 +34,8 @@ async function getUserSettings(userId: string) { // Return type will be inferred
     return null;
   }
 
-  // Safely parse customLinks
   let parsedCustomLinks: CustomLink[] = [];
   if (userProfileFromDb.customLinks && Array.isArray(userProfileFromDb.customLinks)) {
-    // Filter and type-check each link
     parsedCustomLinks = userProfileFromDb.customLinks.reduce((acc: CustomLink[], link: any) => {
       if (typeof link === 'object' && link !== null && 
           typeof link.title === 'string' && typeof link.url === 'string') {
@@ -47,10 +45,9 @@ async function getUserSettings(userId: string) { // Return type will be inferred
     }, []);
   }
 
-  // Return the database profile with customLinks parsed
   return {
     ...userProfileFromDb,
-    customLinks: parsedCustomLinks, // Ensure customLinks is always an array
+    customLinks: parsedCustomLinks, 
   };
 }
 
@@ -60,23 +57,20 @@ export default async function SettingsPage() {
 
   if (authError || !user) {
     console.error('Settings page: No Supabase user or auth error, redirecting to login.');
-    redirect('/login'); // Redirect to your Supabase login page
+    redirect('/login');
   }
 
   const userProfile = await getUserSettings(user.id);
 
   if (!userProfile) {
     console.error('Settings page: User profile not found in Prisma for Supabase ID:', user.id);
-    // This could happen if a user exists in Supabase Auth but not in your Prisma user table
-    // Or if the onboarding wasn't completed fully.
-    // Consider redirecting to onboarding or showing an error message.
-    redirect('/onboarding'); // Or redirect to home or an error page
-    return null; // Ensure no further rendering attempt
+    redirect('/onboarding');
+    return null;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl"> {/* Adjusted page container */}
-      <div className="mb-8"> {/* Wrapper for heading and description */}
+    <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <div className="mb-8"> 
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           User Settings
         </h1>
@@ -84,20 +78,13 @@ export default async function SettingsPage() {
           Manage your profile information, preferences, and account details.
         </p>
       </div>
-      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md dark:bg-gray-800"> {/* Form container */}
-        {/* 
-          The SettingsForm component will likely need to be updated to accept 
-          the full userProfile object and use Supabase-compatible actions for updates.
-          This is a placeholder for now.
-        */}
+      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md dark:bg-gray-800">
+        {
+        }
         <SettingsForm 
-          userProfile={userProfile} // Pass the fetched and slightly processed user profile
+          userProfile={userProfile}
         />
-        {/* Example of displaying some data directly:
-        <p>Email: {userProfile.email}</p>
-        <p>Username: {userProfile.userName || 'Not set'}</p>
-        <p>Full Name: {userProfile.fullName || 'Not set'}</p>
-        */}
+        {}
       </div>
     </div>
   );

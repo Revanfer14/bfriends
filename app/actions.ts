@@ -66,6 +66,7 @@ export async function createCommunity(prevState: FormState, formData: FormData):
     });
 
     revalidatePath("/");
+    revalidatePath(`/p/${createdName}`);
     return {
       status: 'success',
       message: `Community '${createdName}' created successfully!`,
