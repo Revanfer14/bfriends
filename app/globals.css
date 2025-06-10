@@ -113,16 +113,14 @@
   outline: none;
 }
 
-/* Tiptap Placeholder Styles */
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
-  color: hsl(var(--muted-foreground)); /* Use a muted color from your theme */
+  color: hsl(var(--muted-foreground));
   pointer-events: none;
   height: 0;
 }
 
-/* Optional: Adjust placeholder color for dark mode if needed */
 .dark .ProseMirror p.is-editor-empty:first-child::before {
-  color: hsl(var(--muted-foreground)); /* Ensure this var provides good contrast in dark mode */
+  color: hsl(var(--muted-foreground));
 }

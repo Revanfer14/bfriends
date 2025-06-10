@@ -11,7 +11,7 @@ import { MenuIcon, UserCircle, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { logoutAction } from "../actions";
-import { useTransition } from 'react';
+import { useTransition } from "react";
 
 interface AppProps {
   userImage: string | null;
@@ -24,8 +24,8 @@ export function UserDropdown({ userImage, userName }: AppProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <div className="rounded-xl border px-2 py-2 lg:px-4 lg:py-2 flex items-center gap-x-3 cursor-pointer">
+      <DropdownMenuTrigger asChild>
+        <div className="rounded-xl border px-2 py-2 lg:px-4 lg:py-2 flex items-center gap-x-3 cursor-pointer outline-none focus-visible:ring-0">
           <MenuIcon className="w-6 h-6 lg:w-5 lg:h-5" />
 
           <div className="relative h-8 w-8 hidden lg:block">
@@ -45,7 +45,6 @@ export function UserDropdown({ userImage, userName }: AppProps) {
         </div>
       </DropdownMenuTrigger>
 
-      {/* Drop down content */}
       <DropdownMenuContent align="start" className="w-[233px]">
         <DropdownMenuItem>
           <Link className="w-full" href="/p/create">
@@ -59,7 +58,10 @@ export function UserDropdown({ userImage, userName }: AppProps) {
         </DropdownMenuItem>
         {userName && (
           <DropdownMenuItem>
-            <Link className="w-full flex items-center" href={`/profile/${userName}`}>
+            <Link
+              className="w-full flex items-center"
+              href={`/profile/${userName}`}
+            >
               <UserCircle className="mr-2 h-4 w-4" />
               My Profile
             </Link>
@@ -74,7 +76,6 @@ export function UserDropdown({ userImage, userName }: AppProps) {
 
         <DropdownMenuSeparator />
 
-        {/* Logout */}
         <DropdownMenuItem
           onClick={() => {
             startTransition(async () => {
@@ -84,7 +85,7 @@ export function UserDropdown({ userImage, userName }: AppProps) {
           disabled={isPending}
           className="cursor-pointer"
         >
-          {isPending ? 'Logging out...' : 'Log out'}
+          {isPending ? "Logging out..." : "Log out"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
